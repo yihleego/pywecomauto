@@ -52,8 +52,8 @@ def get_app_by_secret(secret):
 
 
 def update_client_by_id(client):
-    data = {'company_name': client.company_name,
-            'user_name': client.user_name,
+    data = {'company': client.company,
+            'name': client.name,
             'expired_time': client.expired_time,
             'status': client.status}
     db = open_session()
@@ -65,8 +65,8 @@ def update_client_by_id(client):
 
 
 def update_client_by_handle(client):
-    data = {'company_name': client.company_name,
-            'user_name': client.user_name,
+    data = {'company': client.company,
+            'name': client.name,
             'expired_time': client.expired_time,
             'status': client.status}
     db = open_session()
@@ -98,8 +98,8 @@ def get_idle_client():
 def get_using_client(company_name, user_name):
     db = open_session()
     client = db.query(Client) \
-        .filter(Client.company_name == company_name) \
-        .filter(Client.user_name == user_name) \
+        .filter(Client.company == company_name) \
+        .filter(Client.name == user_name) \
         .filter(Client.status == 1) \
         .first()
     db.close()
@@ -174,8 +174,8 @@ def get_loginable_task():
         .filter(Task.type != TaskType.LOGOUT.value) \
         .filter(Task.deleted == 0) \
         .filter(not_(exists()
-                     .where(Client.company_name == Task.company_name)
-                     .where(Client.user_name == Task.user_name)
+                     .where(Client.company == Task.company)
+                     .where(Client.name == Task.name)
                      .where(Client.status.in_([ClientStatus.USING.value, ClientStatus.WAITING.value])))) \
         .order_by(asc(Task.scheduled_time)) \
         .first()
@@ -190,8 +190,8 @@ def get_executable_task():
         .filter(Task.status == TaskStatus.CREATED.value) \
         .filter(Task.deleted == 0) \
         .filter(or_(exists()
-                    .where(Client.company_name == Task.company_name)
-                    .where(Client.user_name == Task.user_name)
+                    .where(Client.company == Task.company)
+                    .where(Client.name == Task.name)
                     .where(Client.status == ClientStatus.USING.value),
                     Task.type == TaskType.LOGOUT.value)) \
         .order_by(asc(Task.scheduled_time)) \
@@ -203,8 +203,8 @@ def get_executable_task():
 def list_tasks_by_user(company_name, user_name):
     db = open_session()
     tasks = db.query(Task) \
-        .filter(Task.company_name == company_name) \
-        .filter(Task.user_name == user_name) \
+        .filter(Task.company == company_name) \
+        .filter(Task.name == user_name) \
         .filter(Task.deleted == 0) \
         .all()
     db.close()

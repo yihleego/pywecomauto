@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import logging
 import threading
 import time
@@ -6,7 +7,6 @@ import urllib.request
 
 from pywinauto.findwindows import find_windows
 
-from pywecomauto.util import launcher
 from pywecomauto.manager import *
 from pywecomauto.models import *
 from pywecomauto.task import *
@@ -26,8 +26,7 @@ async def run(event):
     thread = threading.Thread(target=watch_client_runnable, args=(event,))
     thread.start()
     thread2 = threading.Thread(target=notify_runnable, args=(event,))
-    #thread2.start()
-    launcher.start(3)
+    # thread2.start()
     while event.is_set():
         try:
             ok = check_client_status() or check_client_timeout() or execute_task()
@@ -59,7 +58,7 @@ def check_client_status():
             userinfo = TASKS[TaskType.CHECK].run(handle)
             if not userinfo:
                 continue
-            update_client_by_handle(Client(handle=handle, company_name=userinfo.get('company_name'), user_name=userinfo.get('user_name'), status=ClientStatus.USING.value))
+            update_client_by_handle(Client(handle=handle, company_name=userinfo.get('company'), user_name=userinfo.get('name'), status=ClientStatus.USING.value))
         except Exception:
             logging.error('Failed to check client', exc_info=True)
     return True
@@ -80,7 +79,7 @@ def execute_task():
         return False
     try:
         update_task(Task(id=task.id, status=TaskStatus.RUNNING.value, executed_time=now()))
-        client = get_using_client(task.company_name, task.user_name)
+        client = get_using_client(task.company, task.name)
         if task.type == TaskType.LOGIN.value:
             result = execute_login_task(task, client)
         elif task.type == TaskType.LOGOUT.value:
@@ -107,7 +106,7 @@ def execute_login_task(task, client):
     if not client:
         raise TaskException(TaskStatus.UNAVAILABLE.value)
     qrcode = TASKS[task.type].run(client.handle)
-    update_client_by_id(Client(id=client.id, company_name=task.company_name, user_name=task.user_name, status=ClientStatus.IDLE.value, expired_time=after_seconds(60)))
+    update_client_by_id(Client(id=client.id, company_name=task.company, user_name=task.name, status=ClientStatus.IDLE.value, expired_time=after_seconds(60)))
     return qrcode
 
 
@@ -172,8 +171,8 @@ def notify_runnable(event):
 
 def build_result(task):
     data = {'task_id': task.id,
-            'company_name': task.company_name,
-            'user_name': task.user_name,
+            'company': task.company,
+            'name': task.name,
             'type': task.type,
             'result': task.result,
             'status': task.status,

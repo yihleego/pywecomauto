@@ -6,7 +6,7 @@ import winreg
 import psutil
 import win32process
 
-from pywecomauto.util.handle import find_handles, close_handle
+from pywecomauto.util.handler import find_handles, close_handle
 
 BASE_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 WEWORK_PROCESS_NAME = 'WXWork.exe'

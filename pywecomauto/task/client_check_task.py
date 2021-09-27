@@ -64,7 +64,7 @@ class ClientCheckTask(BaseTask):
             copy("")
             keyevent("^a^c")
             user_name = paste()
-            return {'company_name': company, 'user_name': user_name}
+            return {'company': company, 'name': user_name}
         finally:
             if config_device:
                 config_device.close()
@@ -83,10 +83,10 @@ class ClientCheckTask(BaseTask):
         if not values or len(values[0]) != 2:
             return
         userinfo = values[0]
-        return {'company_name': userinfo[0], 'user_name': userinfo[1]}
+        return {'company': userinfo[0], 'name': userinfo[1]}
 
     def set_userinfo(self, handle, userinfo):
-        SetWindowText(handle, TITLE_FORMAT.format(userinfo['company_name'], userinfo['user_name'], len(userinfo['company_name']), len(userinfo['user_name'])))
+        SetWindowText(handle, TITLE_FORMAT.format(userinfo['company'], userinfo['name'], len(userinfo['company']), len(userinfo['name'])))
 
     def close_existing_windows(self, process):
         handles = find_windows(class_name_re='ConfigWindow|ModifyUserInfoWindow', process=process)

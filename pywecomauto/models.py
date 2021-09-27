@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
 from datetime import datetime, timedelta
 from enum import IntEnum
 
@@ -17,18 +16,6 @@ def after_seconds(s):
     return (datetime.now() + timedelta(seconds=s)).strftime("%Y-%m-%d %H:%M:%S")
 
 
-class App(Base):
-    __tablename__ = "app"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    created_time = Column(String, default=now)
-    updated_time = Column(String, onupdate=now)
-    name = Column(String)
-    private_key = Column(String)
-    public_key = Column(String)
-    url = Column(String)
-    status = Column(Integer, default=0)
-
-
 class Client(Base):
     __tablename__ = "client"
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -37,11 +24,8 @@ class Client(Base):
     expired_time = Column(String)
     process = Column(Integer, index=True)
     handle = Column(Integer, index=True)
-    company_name = Column(String)
-    user_name = Column(String)
-    alias = Column(String)
-    phone = Column(String)
-    avatar = Column(String)
+    name = Column(String)
+    company = Column(String)
     status = Column(Integer, default=0)
 
 
@@ -50,19 +34,16 @@ class Task(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     created_time = Column(String, default=now)
     updated_time = Column(String, onupdate=now)
-    deleted_time = Column(String)
-    scheduled_time = Column(String, default=now)
     executed_time = Column(String)
     finished_time = Column(String)
-    company_name = Column(String)
-    user_name = Column(String)
+    name = Column(String)
+    company = Column(String)
     type = Column(Integer)
     priority = Column(Integer)
     content = Column(String)
     result = Column(String)
     message = Column(String)
     status = Column(Integer, default=0)
-    deleted = Column(Integer, default=0)
 
 
 class Notification(Base):

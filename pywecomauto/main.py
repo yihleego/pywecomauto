@@ -6,15 +6,16 @@ import threading
 
 from pywecomauto.executor import run
 
-event = threading.Event()
-loop = asyncio.new_event_loop()
-task = loop.create_task(run(event))
-print('main.py', task)
-
 
 def start():
     print('start')
+    global event
+    global task
+    global loop
+    event = threading.Event()
     event.set()
+    loop = asyncio.new_event_loop()
+    task = loop.create_task(run(event))
     signal.signal(signal.Signals.SIGINT, stop)
     signal.signal(signal.Signals.SIGTERM, stop)
     try:
@@ -27,7 +28,7 @@ def start():
 
 
 def stop(*args):
-    print('stop')
+    print('stop', args)
     event.clear()
     task.cancel()
     loop.stop()
