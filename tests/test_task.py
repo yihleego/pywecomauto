@@ -2,10 +2,12 @@
 import re
 import unittest
 
+from pywinauto.findwindows import find_windows
 from win32gui import SetWindowText
 
 from pywecomauto.task import ClientCheckTask
 from pywecomauto.task import LoginTask
+from pywecomauto.util import launcher
 
 
 def clear_dict(d):
@@ -26,6 +28,16 @@ def clear_dict(d):
 
 
 class TaskTestSuite(unittest.TestCase):
+
+    def test_client(self):
+        p = launcher.start(2)
+        handles = find_windows(class_name='WeChatLogin')
+        print('handles:', handles)
+        for h in handles:
+            task = LoginTask()
+            url1 = task.run(h)
+            print(url1)
+
     def test_qrcode_task(self):
         task = LoginTask()
         url1 = task.run(0x411190)
